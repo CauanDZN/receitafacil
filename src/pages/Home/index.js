@@ -1,12 +1,34 @@
-import { useState } from "react";
-import { View, Text, TextInput, StyleSheet, SafeAreaView, TouchableOpacity } from "react-native";
+import { useState, useEffect } from "react";
+
+import { 
+    View, 
+    Text, 
+    TextInput, 
+    StyleSheet, 
+    SafeAreaView, 
+    TouchableOpacity, 
+    FlatList 
+} from "react-native";
 
 import { Ionicons } from '@expo/vector-icons'
 
+import api from '../../services/api'
+
 import { Logo } from "../../components/Logo";
+import { FoodList } from "../../components/FoodList";
 
 export function Home(){
     const [inputValue, setInputValue] = useState("")
+    const [data, setData] = useState([])
+
+    useEffect(() => {
+        async function fetchApi(){
+            const response = await api.get("/foods")
+            setData(response.data)
+        }
+
+        fetchApi()
+    },[])
 
     function handleSearch(){
         console.log("Você digitou: ")
@@ -31,6 +53,14 @@ export function Home(){
                     <Ionicons name="search" size={28} color="#4CBE6C" />
                 </TouchableOpacity>
             </View>
+
+            <FlatList 
+                data={data}
+                keyExtractor={ (item) => String(item.id) }
+                renderItem={ ({}) => <FoodList data={item} /> }
+                showsVerticalScrollIndicator={false}
+            />
+
         </SafeAreaView>
     )
 }
